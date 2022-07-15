@@ -336,7 +336,8 @@ Modifier.aspectRatio(
 <br>
 만약 size가 50dp 이고 가로세로 비율이 2 일 때  
 `matchHeightConstraintsFirst = false` 일 경우 우선 순서가 `Constraints.maxWidth` 이므로 `width == 50 , height == 25`  
-`matchHeightConstraintsFirst = true` 일 경우 우선 순서가 `Constraints.maxHight` 이므로 `width == 100 , height == 50`  
+`matchHeightConstraintsFirst = true` 일 경우 우선 순서가 `Constraints.maxHight` 이므로 `width == 100 , height == 50`
+
 ```kotlin
 Box(  
     modifier = Modifier  
@@ -352,5 +353,6 @@ Box(
         .aspectRatio(2f, matchHeightConstraintsFirst = false)  
 )
 ```
+
 <img width="310" alt="스크린샷 2022-07-16 오전 5 29 45" src="https://user-images.githubusercontent.com/103296212/179305992-96190f4d-3863-4033-915e-082c99484685.png">
 
