@@ -5,6 +5,7 @@
 - 사용자가 앱에서 스크롤할 때 스크롤의 위치
 
 Jeckpack Compose를 앱에서 상태를 저장하고 사용하는 위치와 방법을 명시적으로 나타낼 수 있습니다.
+<br>
 
 # 상태 및 구성
 컴포즈는 XML 기반 뷰와 다르게 자동으로 업데이트 하지 않고 상태가 변화할 때 마다 업데이트를 하는데 이를 `리컴포지션` 이라고 합니다. 
@@ -28,10 +29,11 @@ fun HelloContent(){
 }
 ```
 <p align="center">
-  ![textfield_1](https://user-images.githubusercontent.com/103296212/179394862-445b4801-7a84-4a6a-a535-0220b9bbc575.gif)
+	<img src="https://user-images.githubusercontent.com/103296212/179394862-445b4801-7a84-4a6a-a535-0220b9bbc575.gif">
 <p/>
 
 코드를 실행하고 입력을 했지만 아무런 반응이 없습니다. `TextField` 가 자체적으로 업데이트를 하지 않고 `value` 매개변수가 변해야 업데이트를 하기 때문입니다. 이를 해결하기 위해 상태를 변경 해주어야 합니다.
+<br>
 
 # 컴포저블의 상태
 구성 가능한 함수는 `remember` API를 사용해 메모리에 객체를 저장할 수 있습니다.  
@@ -91,7 +93,7 @@ fun HelloContent(){
 }
 ```
 <p align="center">
-  ![textfield_2](https://user-images.githubusercontent.com/103296212/179396213-f18d6b9c-9eb3-4ab7-a477-400e51d29395.gif)
+	<img src="https://user-images.githubusercontent.com/103296212/179396213-f18d6b9c-9eb3-4ab7-a477-400e51d29395.gif">
 <p/>
 
 `remember` 가 리컴포지션 될 때 상태는 유지 해주지만 아래와 같은 구성이 변경 될 때는 상태가 유지되지 않습니다.
@@ -104,6 +106,70 @@ fun HelloContent(){
 ```kotlin
 var state by rememberSaveable { mutableStateOf() }
 ```
+<br>
+<br>
+<br>
+
+### 상태를 저장하는 또 다른 방법
+`rememberSaveable` 로 상태를 저장하지만 만약 `Bundle` 에 저장할 수 있는 타입이 아닌 경우도 있습니다. 이 문제를 해결하기 위한 몇 가지 방법이 있습니다.  
+<br>
+#### Parcelize
+`@Parcelize` 주석을 추가하면 Parcelable이 되어 `Bundle` 에 저장할 수 있게 됩니다.
+```kotlin
+@Parcelize
+data class Person(val name: String, val age: Int): Parcelable
+
+@Composable
+fun PersonDetail(){
+	var selectedPerson by rememberSaveable {
+		mutableStateOf(Person("Kim", 21))
+	}
+}
+```
+<br>
+
+#### MapSaver
+`@Parcelize` 가 적합하지 않을 경우 `MapSaver` 를 이용해  시스템이 `Bundle` 에 저장될 수 있는 Map 형태로 객체를 변환할 수 있습니다.
+```kotlin
+data class Person(val name: String, val age: Int)
+
+val personSaver = run {
+	val nameKey = "Name"
+	val ageKey = "Age"
+	mapSaver(
+		save = { mapOf(nameKey to it.name, ageKey to it.age) },
+		restore = { Person(it[nameKey] as String, it[ageKey] as Int)
+	)
+}
+
+@Composable
+fun PersonDetail(){
+	val selectedPerson = rememberSaveable(stateSaver = personSaver){
+		mutableStateOf(Person("Kim", 21))
+	}
+}	
+```
+<br>
+
+#### ListSaver
+`listSaver` 를 사용하고 인덱스를 키로 사용하여 Map 대신 List로 정의할 수 있습니다.
+```kotlin
+data class Person(val name: String, val age: Int)
+
+val personSaver = listSaver<Person, Any>(
+	save = { listOf(it.name, it.age) },
+	restore = { Person(it[0] as String, it[1] as Int) }
+)
+
+@Composable
+fun PersonDetail(){
+	val selectedPerson = rememberSaveable(stateSaver = personSaver) {
+		mutableStateOf(Person("Kim", 21))
+	}
+}
+```
+<br>
+
 # 상태 호이스팅
 ### Stateful 과 Stateless
 이때까지 만든 코드들은 컴포저블 내부에서 상태를 저장하고 변경하므로 Stateful 컴포저블입니다. Stateful 컴포저블은 호출자가 상태를 제어할 필요가 없고 상태를 직접 관리하지 않아도 상태를 사용할 수 있는 경우에 유용합니다. 하지만 재사용하기 어렵고 테스트 하기 어렵다는 단점이 있습니다.  
@@ -117,3 +183,36 @@ Stateful 컴포저블의 상태를 Stateless 컴포저블로 끌어올리기 위
 `상태 호이스팅` 은 컴포저블을 Stateless로 만들기 위해 상태를 컴포저블의 호출자로 옮기는 패턴입니다. 상태를 끌어올리기 위해선 상태 변수를 두 매개변수로 바꾸는 것입니다.
 - `value: T` 표시할 상태의 값
 - `onValueChange: (T) -> Unit` T 값이 새 값일 경우 변경하도록 요청하는 이벤트
+
+이제 Stateful 컴포저블을 Stateless 컴포저블로 변환 해보겠습니다.
+```kotlin
+@Composable
+fun HelloScreen(){
+	var text by remember { mutableStateOf("") }
+	
+	HelloContent(value = text, onValueChange = { text = it ))
+}
+
+@Composable
+fun HelloContent(
+	value: String,
+	onValueChange: (String) -> Unit
+){
+	Column(
+		modifier = Modifier.padding(16.dp)
+	){
+		Text(
+			text = "Hello, $value",
+			modifier = Modifier.padding(bottom = 8.dp),
+			style = MaterialTheme.typography.h5
+		)
+		TextField(
+			value = value,
+			onValueChange = onValueChange,
+			label = { Text("Name") }
+		)
+	}
+}
+```
+`HelloContent` 에서 상태를 끌어올림으로써 더 쉽게 컴포저블을 추론할 수 있고, `HelloScreen` 뿐만 아니라 다른 컴포저블에서도 재사용 할 수 있습니다.  
+또한 `HelloScreen` 을 수정하거나 교체해도 `HelloContent` 는 변경할 필요가 없어집니다.
