@@ -91,3 +91,13 @@ kotlinOptions {
 <br>
 <br>
 <br>
+
+# JetPack Compose ViewModel
+
+`Jetpack Compose` 에서는 `viewModel()` 함수를 호출하여 컴포저블에서 ViewModel을 사용할 수 있습니다.
+
+> 생명 주기와 범위 지정으로 인해 화면 수준의 컴포저블에서 ViewModel 인스턴스를 액세스하고 호출해야 합니다.  
+> 또한 ViewModel 인스턴스는 다른 컴포저블의 인자로 전달하면 안됩니다.
+
+`viewModel()` 함수를 사용하기 위해선 아래의 종속 항목을 추가하면 됩니다.
+> androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1:$lifecycle_version
