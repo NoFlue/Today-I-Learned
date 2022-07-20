@@ -101,3 +101,27 @@ kotlinOptions {
 
 `viewModel()` 함수를 사용하기 위해선 아래의 종속 항목을 추가하면 됩니다.
 > androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1:$lifecycle_version
+
+<br>
+
+`viewModel()` 은 기존 ViewModel을 반환하거나 지정된 생명주기의 새로운 ViewModel을 생성합니다.
+```kotlin
+class MyViewModel: ViewModel() { /* ... */ }
+
+@Composable
+fun FirstScreen(
+	// 해당 액티비티의 생명 주기 동안의 ViewModel
+	viewModel: MyViewModel = viewModel()
+){
+	/* ... */
+}
+
+fun SecondScreen(
+	// FirstScreen 과 같은 생명 주기를 가진 ViewModel 일 경우 같은 ViewModel을 반환
+	viewModel: MyViewModel = viewModel()
+){
+	/* ... */
+}
+```
+
+만약 ViewModel에 매개 변수가 있다면 `viewModel()` 은 선택적으로 `ViewModelProvider.Factory` 를 매개 변수로 사용합니다.
