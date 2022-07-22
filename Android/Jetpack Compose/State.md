@@ -5,6 +5,9 @@
 - 사용자가 앱에서 스크롤할 때 스크롤의 위치
 
 Jeckpack Compose를 앱에서 상태를 저장하고 사용하는 위치와 방법을 명시적으로 나타낼 수 있습니다.
+
+<br>
+<br>
 <br>
 
 # 상태 및 구성
@@ -33,6 +36,9 @@ fun HelloContent(){
 <p/>
 
 코드를 실행하고 입력을 했지만 아무런 반응이 없습니다. `TextField` 가 자체적으로 업데이트를 하지 않고 `value` 매개변수가 변해야 업데이트를 하기 때문입니다. 이를 해결하기 위해 상태를 변경 해주어야 합니다.
+
+<br>
+<br>
 <br>
 
 # 컴포저블의 상태
@@ -57,6 +63,7 @@ interface MutableState<T> : State<T>{
 `MutableState` 는 구조 분해 선언을 사용합니다. `component1` 은 State의 값을 반환하는 함수고, `component2` 는  상태를 변경하는 함수입니다.  
 `value` 매개변수가 변경되면 `value` 의 값을 읽는 구성 가능한 함수의 리컴포지션이 예약됩니다.
 <br>
+
 `MutableState` 타입의 객체를 생성하는 방법은 세 가지가 있습니다.
 - val value = remember { mutableStateOf("") }
 - var value by remember { mutableStateOf("") }
@@ -69,6 +76,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 ```
 <br>
+
 이제 상태 생성 선언 방법도 알았으니 `TextField` 를 리컴포지션 하기 위해 상태를 매개변수 값에 넣어보겠습니다.
 
 ```kotlin
@@ -106,14 +114,16 @@ fun HelloContent(){
 ```kotlin
 var state by rememberSaveable { mutableStateOf() }
 ```
+
 <br>
 <br>
 <br>
 
-### 상태를 저장하는 또 다른 방법
+# 상태를 저장하는 또 다른 방법
 `rememberSaveable` 로 상태를 저장하지만 만약 `Bundle` 에 저장할 수 있는 타입이 아닌 경우도 있습니다. 이 문제를 해결하기 위한 몇 가지 방법이 있습니다.  
 <br>
-#### Parcelize
+
+### Parcelize
 `@Parcelize` 주석을 추가하면 Parcelable이 되어 `Bundle` 에 저장할 수 있게 됩니다.
 ```kotlin
 @Parcelize
@@ -128,7 +138,7 @@ fun PersonDetail(){
 ```
 <br>
 
-#### MapSaver
+### MapSaver
 `@Parcelize` 가 적합하지 않을 경우 `MapSaver` 를 이용해  시스템이 `Bundle` 에 저장될 수 있는 Map 형태로 객체를 변환할 수 있습니다.
 ```kotlin
 data class Person(val name: String, val age: Int)
@@ -151,7 +161,7 @@ fun PersonDetail(){
 ```
 <br>
 
-#### ListSaver
+### ListSaver
 `listSaver` 를 사용하고 인덱스를 키로 사용하여 Map 대신 List로 정의할 수 있습니다.
 ```kotlin
 data class Person(val name: String, val age: Int)
@@ -168,6 +178,9 @@ fun PersonDetail(){
 	}
 }
 ```
+
+<br>
+<br>
 <br>
 
 # 상태 호이스팅
