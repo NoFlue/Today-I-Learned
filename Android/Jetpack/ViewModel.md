@@ -100,7 +100,7 @@ kotlinOptions {
 > 또한 ViewModel 인스턴스는 다른 컴포저블의 인자로 전달하면 안됩니다.
 
 `viewModel()` 함수를 사용하기 위해선 아래의 종속 항목을 추가하면 됩니다.
-> androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1:$lifecycle_version
+> androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version
 
 <br>
 
