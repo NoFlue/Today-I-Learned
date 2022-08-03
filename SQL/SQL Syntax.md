@@ -97,3 +97,102 @@ WHERE Gender='Man';
 |AND|모든 조건이 참인 경우|WHERE Name='Kim' AND Age=21|
 |OR|하나의 조건이라도 참인 경우|WHERE Id=2 OR Age>=23|
 |NOT|조건이 참이 아닐 경우|WHERE NOT Id=1|
+
+<br>
+<br>
+
+## ORDER BY
+`ORDER BY` 는 결과 테이블을 오름차순 혹은 내림차순으로 정렬합니다.  정렬할 기준을 정해주지 않으면 기본 값으로 오름차순으로 정렬하게 됩니다.
+```sql
+SELECT column1, column2
+FROM table_name
+ORDER BY column1, column2 ASC|DESC;
+```
+
+<br>
+<br>
+
+## INSERT INTO
+`INSERT INTO` 는 테이블에 새 레코드(행)을 추가합니다.  
+새 레코드를 추가하는 방법에는 2가지가 있습니다.  
+<br>
+
+**첫 번째**는 각 열과 삽입할 값을 지정합니다.
+```sql
+INSERT INTO table_name (column1, column2, column3)
+VALUE (value1, value2, value3);
+```
+
+<br>
+
+**두 번째**는 삽입할 값만 지정합니다. 하지만 열의 순서대로 값을 넣기 때문에 추가하기 전 올바르게 작성했는지 확인해야 합니다.
+```sql
+INSERT TO table_name
+VALUES (value1, value2, value3);
+```
+
+<br>
+
+예시로 아래와 같은 테이블(Region)에 데이터를 추가해보겠습니다.
+|Id|Name|Address|City|Country|
+|---|---|---|---|---|
+|1|청와대|종로구 청와대로 1|서울|대한민국|
+<br>
+
+```sql
+INSERT INTO Region (Name, City, Country)
+VALUES (유튜브, 캘리포니아, 미국)
+```
+만약 위와 같이 `Address` 열의 값을 추가하지 않으면 
+|Id|Name|Address|City|Country|
+|---|---|---|---|---|
+|1|청와대|종로구 청와대로 1|서울|대한민국|
+|2|유튜브|null|캘리포니아|미국|
+다음과 같이 해당 열의 값은 `null` 로 처리됩니다.
+
+<br>
+<br>
+
+## NULL
+해당 열의 값이 선택사항일 경우 값이 `NULL` 일 경우도 있습니다. `NULL` 값은 비교할 수 있는 값이 아니기 때문에 연산자로 비교할 수 없습니다.  
+<br>
+
+`NULL` 값인지 판단하기 위해선 `IS NULL` 와 `IS NOT NULL` 키워드를 사용해야 합니다.
+```sql
+SELECT column1 FROM table_name
+WHERE column1 IS NULL;
+
+또는
+
+WHERE column1 IS NOT NULL;
+```
+
+<br>
+<br>
+
+## UPDATE
+`UPDATE` 는 기존 레코드의 값을 변경합니다.
+```sql
+UPDATE table_name
+SET column1 = value1, column2 = value2
+WHERE condition;
+```
+<br>
+
+`WHERE` 을 통해 조건을 걸어 원하는 레코드만 값을 업데이트 할 수 있습니다. 만약 조건을 걸지 않을 경우 해당 열의 값을 전부 변경하게 됩니다.
+
+<br>
+<br>
+
+## DELETE
+`DELETE` 는 레코드를 제거합니다.
+```sql
+DELETE FROM table_name
+WHERE condition;
+```
+<br>
+
+`UPDATE` 와 마찬가지로 `WHERE` 을 통해 조건을 걸지 않을 경우 테이블이 삭제가 됩니다.
+
+<br>
+<br>
