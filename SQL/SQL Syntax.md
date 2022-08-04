@@ -148,6 +148,7 @@ VALUES (유튜브, 캘리포니아, 미국)
 |---|---|---|---|---|
 |1|청와대|종로구 청와대로 1|서울|대한민국|
 |2|유튜브|null|캘리포니아|미국|
+
 다음과 같이 해당 열의 값은 `null` 로 처리됩니다.
 
 <br>
@@ -196,3 +197,49 @@ WHERE condition;
 
 <br>
 <br>
+
+## Functions
+SQL에도 다른 프로그래밍 언어와 같이 연산을 할 수 있는 함수들이 존재합니다.  
+<br>
+
+### MIN, MAX
+최솟값과 최댓값을 반환합니다.
+```sql
+SELECT MIN(column1) FROM table_name
+WHERE condition;
+
+SELECT MAX(column2) FROM table_name
+WHERE condition;
+```
+
+<br>
+
+### COUNT, SUM, AVG
+`COUNT` 는 해당 열의 행의 수,  `SUM` 은 해당 열의 모든 값을 합한 값, `AVG` 는 해당 열의 평균값을 반환합니다.
+```sql
+SELECT COUNT(DISTINCT column1) FROM table_name
+
+SELECT SUM(column2) FROM table_name
+
+SELECT AVG(column3) FROM table_name
+```
+
+<br>
+<br>
+
+## Wildcards
+`LIKE` 키워드를 사용하기 위해선 패턴을 입력해야 합니다. 패턴을 만들기 위해서는 `Wildcards` 를 활용해야 합니다.
+|문자(MS, SQL Server)|설명|예시|
+|:---:|---|---|
+|*, %|0개 이상의 문자를 나타냅니다.|`bl*` -> `black`, `blue`, `blank`|
+|?, _|하나의 문자를 나타냅니다.|`h?t` -> `hat`, `hit`, `hot`|
+|[]|괄호 안에 있는 문자 중 하나를 나타냅니다.|`h[ao]t` -> `hat`, `hot`|
+|!, ^|괄호 안의 문자를 제외한 하나를 나타냅니다.|`h[!ao]t` -> `hit`, `hut`|
+|-|괄호 안의 문자들의 범위에 속하는 문자 하나를 나타냅니다.|`h[a-c]t` -> `hat`, `hbt`, `hct`|
+|#|숫자 하나를 나타냅니다.|`1#2` == `1[0-9]2`|
+<br>
+
+`Wildcards` 를 사용해 아래와 같은 조건을 만들 수 있습니다.
+- 두 번째 문자가 `s` 인 문자열 -> `'_s%`
+- `el` 이 포함된 문자열 -> `'%el%`
+- `a` 로 시작하고 `o` 로 끝나는 문자열 -> `'a%o'`
