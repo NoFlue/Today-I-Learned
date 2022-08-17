@@ -1,5 +1,8 @@
 > [윤성우의 열혈 자료구조](https://www.orentec.co.kr/booklist/DA_ST_1/book_sub1.php) 를 읽고 정리한 자료이며 Kotlin으로 코드를 작성했습니다
 
+<br>
+<br>
+
 # ADT (Abstract Data Type) 추상 자료형
 `추상 자료형(ADT)` 는 구체적인 기능의 완성 과정을 언급하지 않고, 순수하게 기능이 무엇인지를 나열한 것입니다. OOP 언어의 Class와 매우 유사하다고 볼 수 있습니다.  
 <br>
@@ -31,7 +34,7 @@
 연결 리스트는 여러 노드들의 연결로 리스트를 이루고 있습니다.
 ```kotlin
 data class Node<T>(
-    var data: T,
+    var data: T?,
     var next: Node<T>? = null
 )
 ```
@@ -70,6 +73,8 @@ class LinkedList<T>{
 fun findNodeByPosition(position: Int): Node<T>?{
     var currentNode = headNode
 
+    if(position > size) throw IndexOutOfBoundsException()
+
     repeat(position){
         currentNode = currentNode?.next
     }
@@ -93,11 +98,13 @@ fun insertAtHead(data: T){
 <p align="center">
     <img src="https://user-images.githubusercontent.com/103296212/185084995-c31b4442-48ea-4672-b65b-bde90bb2c832.png">
 </p>
-B 값을 가진 새로운 노드의 next를 머리를 가리키게 한 다음 머리가 새로운 노드를 가리키게 하여 노드를 삽입할 수 있습니다.  
+
+B 값을 가진 새로운 노드의 next를 머리를 가리키게 한 다음 머리가 새로운 노드를 가리키게 하여 노드를 삽입할 수 있습니다.
+<br>
 <br>
 
 ```kotlin
-fun insetAtLast(data: T){
+fun insertAtLast(data: T){
     val newNode = Node(data, null)
     lastNode?.next = newNode
     lastNode = newNode
@@ -109,12 +116,165 @@ fun insetAtLast(data: T){
 <p align="center">
     <img src="https://user-images.githubusercontent.com/103296212/185096636-5efc3750-a717-4bf6-80e6-9e8c4739c88f.png">
 </p>
-B 값을 가진 새로운 노드를 기존의 마지막 노드였던 A의 next와 연결한 다음 마지막 노드를 새로운 노드로 지정해주어 노드를 삽입할 수 있습니다.
 
+B 값을 가진 새로운 노드를 기존의 마지막 노드였던 A의 next와 연결한 다음 마지막 노드를 새로운 노드로 지정해주어 노드를 삽입할 수 있습니다.
+<br>
+<br>
+
+두 함수를 이용헤 특정 위치에 노드를 삽입할 수 있습니다.
+```kotlin
+fun insertAtPosition(data: T, position: Int){
+    if(position > size) throw IndexOutOfBoundsException()
+
+    val prevNode = if(position != 0) findNodeByPosition(position - 1) else null
+    val nextNode = findNodeByPosition(position)
+
+    when{
+        prevNode == null -> insertAtHead(data)
+        nextNode == null -> insertAtLast(data)
+        else -> {
+            val newNode = Node(data, nextNode)
+            prevNode.next = newNode
+            size++
+        }
+    }
+}
+```
+이 함수는 특정 위치의 이전 노드인 `prevNode` 와 다음 노드인 `nextNode` 가 필요합니다. 왜냐하면 노드를 삽입하기 위해선 이전 노드와 다음 노드 사이에 연결하기 떄문입니다.  
+만약 `prevNode` 가 null일 경우 지정한 위치는 머리이므로 머리에 노드를 삽입합니다.  
+`nextNode` 가 null일 경우 지정한 위치는 꼬리이므로 꼬리에 노드를 삽입합니다.  
 <br>
 <br>
 
 ## 삭제
+삭제 또한 삽입과 같이 `머리 삭제` , `꼬리 삭제` , `특정 위치 삭제` 세 가지로 나눌 수 있습니다.  
+<br>
+<br>
+
 ```kotlin
+fun deleteAtHead(){
+    if(headNode == null) return
+
+    val nextNode = headNode?.next
+
+    // 기존 headNode 객체 해제
+    headNode?.data = null
+    headNode?.next = null
+
+    headNode = nextNode
+    size--
+
+    if(size == 0){
+        headNode = null
+        lastNode = null
+    }
+}
+```
+머리가 가리키는 노드를 삭제하기 위해선 다음 노드를 머리가 가리키게 하면 됩니다.  
+`C` 는 `free()` 함수를 이용해 메모리 반납을 할 수 있지만 `코틀린` 은 객체의 값을 null로 설정해주어 GC의 대상으로 포함시켜 메모리를 반환받을 수 있습니다.  
+<br>
+<br>
+
+```kotlin
+fun deleteAtLast(){
+    if(lastNode == null) return
+
+    val prevNode = findNodeByPosition(size - 2) // (size - 1) - 1
+    prevNode?.next = null
+
+    // 기존 lastNode 객체 해제
+    lastNode?.data = null
+    lastNode?.next = null
+
+    lastNode = prevNode
+
+    size--
+
+    if(size == 0){
+        headNode = null
+        lastNode = null
+    }
+}
+```
+꼬리가 가리키는 노드를 삭제하기 위해선 이전 노드를 꼬리가 가리키게 하면 됩니다.  
+<br>
+<br>
+
+```kotlin
+fun deleteAtPosition(position: Int){
+    if(position >= size) throw IndexOutOfBoundsException()
+
+    when(position){
+        0 -> deleteAtHead()
+        size - 1 -> deleteAtLast()
+        else -> {
+            val prevNode = findNodeByPosition(position - 1)
+            val currentNode = findNodeByPosition(position)
+
+            prevNode?.next = currentNode?.next
+
+            // currentNode 객체 해제
+            currentNode?.data = null
+            currentNode?.next = null
+
+            size--
+        }
+    }
+}
 
 ```
+특정 위치의 노드를 삭제하기 위해선 특정 위치의 노드와 이전 노드가 필요합니다.  
+이전 노드가 다음 노드와 연결이 되어야 하는데 특정 위치의 노드만 삭제할 경우 특정 위치의 노드의 정보는 사라지기 때문에 연결할 수가 없게 됩니다.  
+<br>
+<br>
+
+구현한 연결 리스트를 사용해보겠습니다.
+```kotlin
+fun main(){
+    val list = LinkedList<Int>()
+
+    list.insertAtHead(10)
+    list.insertAtHead(20)
+    list.insertAtHead(30)
+
+    list.insertAtPosition(40, 0)
+
+    list.insertAtLast(50)
+
+    println("삽입된 노드 값")
+    repeat(list.size){
+        print("${list.findNodeByPosition(it)?.data} ")
+    }
+    println()
+
+    list.deleteAtHead()
+    list.deleteAtPosition(3)
+    list.deleteAtLast()
+
+    println("섹제된 후 노드 값")
+    repeat(list.size){
+        print("${list.findNodeByPosition(it)?.data} ")
+    }
+}
+```
+
+<p>
+    <img src="https://user-images.githubusercontent.com/103296212/185226600-a704e548-9680-4b8e-8538-0d2d052de106.png">
+</p>
+
+성공적으로 잘 작동되는 것을 볼 수 있습니다.  
+
+<br>
+<br>
+<br>
+
+연결 리스트를 구현하면서 불편한 점이 있습니다. `nextNode` 는 Node 필드에 들어가있지만 `prevNode` 는 없기 때문에 `prevNode` 를 구할 때 마다 함수를 써야한다는 점입니다( 시간 복잡도 O(n-1) )  
+<br>
+
+이러한 불편함을 해결려면 `양방향 연결 리스트(Doubly Linked List)` 로 구현해야 합니다.  
+
+<br>
+<br>
+<br>
+
+# 양방향 연결 리스트(Doubly Linked List)
