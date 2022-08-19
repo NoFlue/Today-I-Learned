@@ -1,5 +1,9 @@
 코틀린으로 코드를 짜다보면 **안전한 호출 연산자(?.)** 와 **let** 을 사용할 때가 있었습니다. 값이 `null` 이 아닐 경우 이벤트를 처리하기 때문인데 `let` 의 용도를 정확히 모르고 쓰기 때문에 이렇게 사용하는게 맞고, `let` 말고 다른 스코프 함수를 사용해도 상관이 없는게 아닐까라는 의구심이 들 때가 많습니다.
 <br>
+
+그렇기 때문에 이 참에 제대로 알아보고 사용하고자 하는 생각에 Scope Function 내용에 대해 정리해보았습니다.
+
+<br>
 <br>
 <br>
 
@@ -137,3 +141,56 @@ println(format.format(date.time))
 <br>
 
 # apply
+`apply` 함수는 수신 받은 객체를 반환하고, 확장 함수이기 떄문에 `this` 를 사용합니다.
+<br>
+
+`apply` 는 수신 객체의 내부 프로퍼티를 변경하거나 객체 생성 시 다양한 프로퍼티를 설정하기 위해 사용합니다. 객체 생성 후 프로퍼티를 설정 할 떄 `apply` 를 사용하면 가독성이 좋아지는 이점이 있습니다.
+
+```kotlin
+val person = Person()
+person.name = "Kim"
+person.age = 21
+person.country = "Korea"
+
+// apply 사용
+val person = Person().apply{
+    name = "Kim"
+    age = 21
+    country = "Korea"
+}
+```
+
+<br>
+<br>
+<br>
+
+# run
+`run` 함수는 코드 블록 수행의 결과를 반환하고, 확장 함수이기 때문에 `this` 를 사용합니다.
+<br>
+
+`run` 은 수신 객체를 사용한 코드를 수행한 후 결과 값을 반환해야 할 경우 사용합니다.
+```kotlin
+data class Person(
+    var name: String,
+    var age: Int,
+    var country: String
+){
+    fun isAdult() = age >= 19
+}
+
+val person = Person("Kim", 21, "Korea")
+val adult = person.run{
+    age = 15
+    isAdult()
+} // false
+```
+<br>
+
+`run` 함수는 다른 함수와 다르게 수신 객체 없이 사용이 가능합니다. 하지만 함수 내부에서 수신 객체를 명시해주어야 합니다.
+```kotlin
+val person = Person("Kim", 21, "Korea")
+val adult = run{
+    person.age = 15
+    person.isAdult()
+}
+```
