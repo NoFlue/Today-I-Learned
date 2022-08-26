@@ -48,3 +48,78 @@ fun LaunchedEffect(
 <br>
 
 # DisposableEffect
+만약 Composable이 Dispose될 떄 Dispose 되어야 할 부수 효과가 있다면 `DisposableEffect` 를 사용하면 됩니다.
+```kotlin
+@Composable
+@NonRestartableComposable
+fun DisposableEffect(
+    key1: Any?,
+    effect: DisposableEffectScope.() -> DisposableEffectResult
+)
+```
+`key1` 은 LaunchedEffect와 같은 파라미터인 DisposableEffect가 재실행되는 키 값이고, `effect` 람다식은 `DisposableEffectResult` 를 반환하는 식입니다.  
+<br>
+
+```kotlin
+DisposableEffect(key){
+    // 키 값이 변경될 경우 재실행 되는 코드
+    onDispose{
+        // Composable 이 Dipose 될 때 Dispose 되어야 하는 효과 제거
+    }
+}
+```
+`onDispose` 은 `DisposableEffectReuslt` 를 반환하기 때문에 람다식에서 마지막에 작성되어야 합니다.  
+
+```kotlin
+inline fun onDispose(
+    crossinline onDisposeEffect: () -> Unit
+): DisposableEffectResult = object: DisposableEffectResult {
+    override fun dispose() {
+        onDisposeEffect()
+    }
+}
+```  
+<br>
+
+아래 코드는 Lifecycle의 상태에 따른 메세지 출력 코드입니다.
+```kotlin
+setContent{
+    TestScreen(
+        onStartLogging = { println("Logging Started") },
+        onStopLogging =  { println("Logging Stopped") }
+    )
+}
+
+
+@Composable
+fun TestScreen(
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
+    onStartLogging: () -> Unit,
+    onStopLogging: () -> Unit
+){
+    val startLogging by rememberUpdatedState(onStartLogging)
+    val stopLogging by rememberUpdatedState(onStopLogging)
+
+    DisposableEffect(lifecycleOwner){
+        val observer = LifecycleEventObserver { _, event ->
+            if(event == Lifecycle.Event.ON_START) startLogging()
+            else if (event == Lifecycle.Event.ON_STOP) stopLogging()
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+        println("Observer Attached")
+
+        onDispose{
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            println("Observer Removed")
+        }
+    }
+}
+```
+
+Composable이 Composition 될 경우 `Observer Attached`, `Logging Started` 문자열이 출력되며, Lifecycle의 상태에 따라 `Logging Started`, `Logging Stopped`가 출력되고, Composable이 Dispose 될 경우 `Logging Stopped`, `Observer Removed` 문자열이 출력됩니다.
+<br>
+
+이벤트 옵저버를 생성할 때 파라미터인 `onStartLogging` 과 `onStopLogging` 람다식을 안쓰고 `rememberUpdatedState` 로 값을 저장해 사용한 이유는 다음과 같습니다.  
+
+>  
