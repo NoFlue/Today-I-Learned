@@ -278,3 +278,40 @@ fun main(){
 <br>
 
 # 양방향 연결 리스트(Doubly Linked List)
+`양방향 연결 리스트` 는 `이중 연결 리스트` 라고 불리며, 이름으로 유추할 수 있듯이 단방향이 아닌 양방향으로 연결된 리스트입니다.  
+
+```kotlin
+data class Node<T>{
+    var data: T?,
+    var prev: Node<T>? = null,
+    var next: Node<T>? = null
+}
+```
+이전에는 `next` 다음 노드를 저장하는 필드 밖에 없었지만 이전 노드를 저장하는 `prev` 가 생기게 되었습니다.  
+
+<p align="center">
+    <img src="https://user-images.githubusercontent.com/103296212/187042178-47c391cd-b832-41dd-a5c6-767992f9632c.png">
+</p>
+
+양방향 연결 리스트를 사용하게 되면 단방향 연결 리스트에서 이전 노드를 구하기 위해 `val prevNode = findNodeByPosition(position - 1)` 를 사용할 필요가 없어지기 때문에 매우 코드 짜기가 편해집니다.  
+
+단방향 연결 리스트에서 특정 위치에 노드를 넣는 코드를 양방향 연결 리스트로 코드를 작성해보겠습니다.
+```kotlin
+fun <T> insertAtPosition(data: T, positon: Int){
+    if(position > size) throw IndexOutOfBoundsException()
+
+    val currentNode = findNodeByPosition(position)
+
+    when{
+        currentNode.prev == null -> insertAtHead(data)
+        currentNode == null -> insertAtLast(data)
+        else -> {
+            val newNode = Node(data, currentNode.prev, currentNode)
+
+            current.prev.next = newNode
+            current.prev = newNode
+        }
+    }
+}
+```
+단방향 연결 리스트의 삽입 함수보다 간결하다는 걸 느낄 수 있습니다.
