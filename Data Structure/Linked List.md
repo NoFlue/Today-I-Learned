@@ -312,6 +312,57 @@ fun <T> insertAtPosition(data: T, positon: Int){
             current.prev = newNode
         }
     }
+
+    size++
 }
 ```
 단방향 연결 리스트의 삽입 함수보다 간결하다는 걸 느낄 수 있습니다.
+
+<br>
+<br>
+<br>
+
+# 원형 연결 리스트
+머리와 꼬리를 잇는 원형 연결 리스트도 있습니다.
+<p align="center">
+    <img src="https://user-images.githubusercontent.com/103296212/187049730-903952b4-e795-4793-82e6-7692d4e8ab3b.png">
+</p>
+
+원형 연결 리스트는 기존의 연결 리스트와 다르게 머리와 꼬리가 이어져 있기 때문에 변수가 하나만 있어도 된다는 장점이 있습니다.  
+예로 들면 C 노드가 `tail` 이라면 머리인 A 노드는 `tail.next` 가 되기 때문에 변수를 하나만 선언해도 됩니다.  
+<br>
+
+원형 연결 리스트는 삭제 같은 경우 다른 리스트보다 복잡합니다. 하지만 머리랑 꼬리가 이어져 있다는 점만 제외하면 단순 연결 리스트와 동일합니다.  
+다만 예외적인 상황에선 단순 연결 리스트와는 다릅니다.
+- 삭제할 노드가 tail이 가리키는 경우
+- 삭제할 노드가 리스트에 홀로 남을 경우
+
+<br>
+
+삭제할 노드가 tail인 경우 tail이 가르키는 노드를 삭제할 노드의 이전 노드를 가리키게 하면 됩니다.
+<p align="center">
+    <img src="https://user-images.githubusercontent.com/103296212/187051123-94a0abdd-dec8-4d26-8ee8-30baa6f884c2.png">
+</p>
+
+또한 노드가 리스트에 홀로 남는 경우 tail을 null로 설정합니다.
+
+```kotlin
+fun deleteAtPosition(position: Int){
+    val currentNode = findNodeByPosition(position)
+    val prevNode = findNodeByPosition(position - 1)
+
+    // 삭제 대상이 tail을 가리킬 경우
+    if(currentNode == tail){
+        // 마지막 노드라면
+        if(tail == tail.next) tail = null
+        else tail = prevNode
+    }
+
+    prevNode.next = currentNode.next
+
+    currentNode.data = null
+    currentNode.next = null
+
+    size--
+}
+``` 
