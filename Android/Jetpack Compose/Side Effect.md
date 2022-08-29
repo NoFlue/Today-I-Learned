@@ -122,4 +122,20 @@ Composable이 Composition 될 경우 `Observer Attached`, `Logging Started` 문�
 
 이벤트 옵저버를 생성할 때 파라미터인 `onStartLogging` 과 `onStopLogging` 람다식을 안쓰고 `rememberUpdatedState` 로 값을 저장해 사용한 이유는 다음과 같습니다.  
 
->  
+> `LaunchedEffect` 블럭 내부에서 접근을 해야 하나, 변경 시 `LaunchedEffect` 가 재시작되지 않도록 하는 경우
+
+무거운 작업을 수행하거나 `LaunchedEffect` 의 `key` 값을 true 및 Unit을 주었을 때 `LaunchedEffect` 가 재시작 되지 않고 외부 Composable 에서 바뀐 상태를 업데이트하기 위해서 사용합니다.  
+<br>
+
+`rememberUpdatedState` 는 `remember { mutableStateOf() }` 의 사용과 크게 다르지 않습니다.
+```kotlin
+var state by remember { mutableStateOf(value) }
+
+@Composable
+fun <T> rememberUpdatedState(newValue: T): State<T> = remember {
+    mutableStateOf(newValue)
+}.apply { value = newValue }
+```
+기존에 쓰던 코드에 `apply` 스코프 함수를 사용해 직접적으로 상태의 값을 설정해주는 차이 뿐입니다.  
+
+값을 직접 넣어줌으로 외부 Composable에서 값이 변경되면 수정된 값으로 업데이트하게 됩니다.
